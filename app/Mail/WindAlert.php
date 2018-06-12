@@ -2,8 +2,6 @@
 
 namespace App\Mail;
 
-use App\Setting;
-use Cache;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -14,6 +12,7 @@ class WindAlert extends Mailable
 
     protected $email;
     protected $speed;
+    protected $city;
 
     /**
      * Create a new message instance.
@@ -24,6 +23,7 @@ class WindAlert extends Mailable
     {
         $this->email = $email;
         $this->speed = $speed;
+        $this->city = $city;
     }
 
     /**
@@ -34,6 +34,10 @@ class WindAlert extends Mailable
     public function build()
     {
         $this->subject('Wind speed has changed');
-        $this->text("Alert. Wind");
+        if ($this->speed >= 10) {
+            $this->text("Alert. Wind speed in {$this->city} is above 10");
+        } else {
+            $this->text("Alert. Wind speed in {$this->city} is below 10");
+        }
     }
 }
