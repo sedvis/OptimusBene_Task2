@@ -3,25 +3,16 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Weather statuses and trigger values
+    | OWM Cities
     |--------------------------------------------------------------------------
     |
     */
-    'WINDY'  => [
-        'operator' => '>=',
-        'value'    => '10',
-        'name'     => 'wind',
-    ],
-    'CALM'   => [
-        'operator' => '<',
-        'value'    => '10',
-        'name'     => 'wind',
-    ],
+    'wind_threshold'=>10,
     'cities' => [
         'Alytus',
         'Anykščiai',
         'Biržai',
-        'Druskininka',
+        'Druskininkai',
         'Elektrėnai',
         'Gargždai',
         'Garliava',

@@ -14,23 +14,15 @@ class WeatherChangeEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $weather_data;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($data)
     {
-        //
-    }
-
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
-     */
-    public function broadcastOn()
-    {
-        return new PrivateChannel('channel-name');
+        $this->weather_data = $data;
     }
 }

@@ -10,20 +10,22 @@ class WindAlert extends Mailable
 {
     use Queueable, SerializesModels;
 
-    protected $email;
     protected $speed;
     protected $city;
+    protected $direction;
 
     /**
      * Create a new message instance.
-     *
+     * @param $speed
+     * @param $city
+     * @param $direction
      * @return void
      */
-    public function __construct($email, $speed, $city)
+    public function __construct($speed, $city, $direction)
     {
-        $this->email = $email;
-        $this->speed = $speed;
-        $this->city = $city;
+        $this->speed     = $speed;
+        $this->city      = $city;
+        $this->direction = $direction;
     }
 
     /**
@@ -34,10 +36,6 @@ class WindAlert extends Mailable
     public function build()
     {
         $this->subject('Wind speed has changed');
-        if ($this->speed >= 10) {
-            $this->text("Alert. Wind speed in {$this->city} is above 10");
-        } else {
-            $this->text("Alert. Wind speed in {$this->city} is below 10");
-        }
+        $this->html("Alert. Wind speed in {$this->city} is {$this->speed}m/s and it is blowing in {$this->direction} degree direction");
     }
 }

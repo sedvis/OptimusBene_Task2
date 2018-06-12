@@ -37,7 +37,7 @@
                                 <div class="h-25"><i class="card-img-top wi wi-day-sunny"></i></div>
                                 <select class="form-control" name="city" id="city">
                                     @foreach(config('owm.cities') as $city)
-                                        <option value="{{strtolower($city)}}"
+                                        <option value="{{$city}}"
                                                 @if($city == $current_city) selected @endif>{{$city}}</option>
                                     @endforeach
                                 </select>
@@ -46,7 +46,7 @@
                                 </h5>
                                 <p class="card-text">Temperature:
                                     <span id="temperature"></span>
-                                                     °C
+                                    °C
                                 </p>
                                 <p class="card-text">Wind speed:
                                     <span id="wind_speed"></span>
@@ -69,6 +69,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
 
 <script>
     $(function () {
@@ -83,30 +84,47 @@
     });
 
     function updateWeather() {
-        var current_city = $('select[name="city"]').val();
-        $.get({
+        $('.card-body').block({
+            message: '<img src="http://cdnjs.cloudflare.com/ajax/libs/semantic-ui/0.16.1/images/loader-large.gif" />',
+            css: {
+                backgroundColor: 'transparent',
+                border: '0'
+            }
+        });
+        $.ajax({
             url: '{{route('current')}}',
             method: 'get',
             dataType: 'json',
-            data: {city: current_city},
+            data: {city: $('select[name="city"]').val()},
             success: function (json) {
-                if (json.success) {
+                if (json.success && json.data.cod !== "404") {
                     $('#title').text(json.data.name);
                     $('#temperature').text(json.data.main.temp);
                     $('#wind_direction').text(json.data.wind.deg);
                     $('#wind_speed').text(json.data.wind.speed);
                 }
+            },
+            complete: function () {
+                $('.card-body').unblock()
             }
         });
     }
 
     function subscribe() {
         var email = $('input[name="email"]').val();
-        $.get({
+
+        $('.card-body').block({
+            message: '<img src="http://cdnjs.cloudflare.com/ajax/libs/semantic-ui/0.16.1/images/loader-large.gif" />',
+            css: {
+                backgroundColor: 'transparent',
+                border: '0'
+            }
+        })
+        $.ajax({
             url: '{{route('subscribe')}}',
             method: 'post',
             dataType: 'json',
-            data: {email: email},
+            data: {email: email, _token: '{{csrf_token()}}'},
             success: function (json) {
                 var html;
                 if (json.success) {
@@ -125,6 +143,9 @@
                         '</div>';
                 }
                 $('#alert_holder').html(html);
+            },
+            complete: function () {
+                $('.card-body').unblock()
             }
         });
     }

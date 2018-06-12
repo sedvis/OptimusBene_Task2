@@ -17,6 +17,7 @@ class WeatherController extends Controller
 
     /**
      * WeatherController constructor.
+     *
      * @param $weather
      */
     public function __construct(OpenWeatherMap $weather)
@@ -41,13 +42,17 @@ class WeatherController extends Controller
     public function current()
     {
         $city = request()->get('city') ?? 'Kaunas';
-        /** @var LaravelOWM $owm */
 
+        $setting = Setting::updateOrCreate(['key' => 'city'], [
+            'key'   => 'city',
+            'value' => $city
+        ]);
+        /** @var LaravelOWM $owm */
         if (Cache::has('owm:' . $city)) {
             $data = Cache::get('owm:' . $city);
-            $msg = 'from cache';
+            $msg  = 'from cache';
         } else {
-            $raw = $this->weather->getRawWeatherData($city, 'metric', 'en', '', 'json');
+            $raw  = $this->weather->getRawWeatherData($city, 'metric', 'en', '', 'json');
             $data = json_decode($raw);
             Cache::put('owm:' . $city, $data, 5);
             $msg = 'live';
@@ -56,21 +61,11 @@ class WeatherController extends Controller
         return $this->sendResponse($data, $msg);
     }
 
-    public function save(Request $request)
-    {
-        $validator = Validator::make($request->all(), ['city' => 'string|required']);
-
-        if ($validator->fails()) {
-            return $this->sendError('City is required');
-        }
-        $setting = Setting::updateOrCreate(['key' => 'city'], [
-            'key'   => 'city',
-            'value' => $request->post('city')
-        ]);
-
-        return $this->sendResponse($setting, 'City saved successfully');
-    }
-
+    /**
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function subscribe(Request $request)
     {
 
@@ -79,10 +74,15 @@ class WeatherController extends Controller
         if ($validator->fails()) {
             return $this->sendError('Email is empty or invalid');
         }
+        $input        = $request->all();
+        $subscription = Subscription::where('email', $input['email'])->first();
 
+        if ($subscription) {
+            return $this->sendError('Already subscribed');
+        }
         $subscription = Subscription::create(request()->all());
 
-        return $this->sendResponse($subscription, 'City saved successfully');
+        return $this->sendResponse($subscription, 'Successfully subscribed');
     }
 
 }

@@ -13,5 +13,4 @@
 
 Route::get('/', 'WeatherController@index');
 Route::get('/current', 'WeatherController@current')->name('current');
-Route::post('/save', 'WeatherController@save')->name('save');
 Route::post('/subscribe', 'WeatherController@subscribe')->name('subscribe');
